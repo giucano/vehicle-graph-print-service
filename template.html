@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=11">
+    <meta charset="UTF-8">
+    <style>
+        @font-face {
+            font-family: 'Open Sans Light';
+            font-style: normal;
+            font-weight: 400;
+            src: url(OpenSans-Light-webfont.eot);
+            src: url('OpenSans-Light-webfont.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'FontAwesome';
+            font-style: normal;
+            src: local('FontAwesome');
+        }
+
+        body {
+            font-family: 'Open Sans Light', sans-serif;
+            overflow: hidden;
+        }
+
+        #selectedtrain {
+            visibility: hidden;
+        }
+
+        .symbol {
+            font-family: FontAwesome;
+            cursor: pointer;
+            text-anchor: middle;
+        }
+
+        .symbolprm {
+            font-family: FontAwesome;
+            cursor: pointer;
+            text-anchor: middle;
+        }
+
+        .graph-svg-component {
+            background-color: white;
+        }
+
+        .griglia-svg {
+            fill: transparent;
+        }
+
+        .griglia-cnt {
+            fill: transparent;
+        }
+
+        .griglia-cnt2 {
+            /*fill: rgba(47,79,79,1);*/
+            fill: white;
+            stroke-width: 2;
+            stroke: #969799;
+        }
+
+        .timeline {
+            visibility: hidden;
+        }
+
+        .xAxis-large-label {
+            font-size: 16px;
+            fill: black;
+        }
+
+        .xAxis-medium-label {
+            font-size: 14px;
+            fill: black;
+        }
+
+        .xAxis-small-label {
+            font-size: 12px;
+            fill: black;
+        }
+
+        .xAxis-large-label-8 {
+            font-size: 10px;
+            fill: black;
+        }
+
+        .xAxis-medium-label-8 {
+            font-size: 8px;
+            fill: black;
+        }
+
+        .xAxis-small-label-8 {
+            font-size: 4px;
+            fill: black;
+        }
+
+        .xAxis {
+            font-size: 12px;
+            fill: black;
+        }
+
+        .xAxis text {
+            text-anchor: middle;
+        }
+
+        .xAxisNotBottom text {
+            visibility: hidden;
+        }
+
+        .xAxisNotBottom path,
+        .xAxisNotBottom line {
+            visibility: visible;
+        }
+
+        .xAxis path,
+        .xAxis line {
+            fill: none;
+            stroke: #969799;
+        }
+
+        .xAxisLoc path,
+        .xAxisLoc line {
+            fill: none;
+            stroke: #969799;
+        }
+
+        .xAxisLocTick1 {
+            stroke-width: 3;
+            stroke: #969799;
+        }
+
+        .xAxisLocTick2 {
+            stroke-width: 9;
+            stroke: #969799;
+        }
+
+        .xAxisVLines path,
+        .xAxisVLines line {
+            fill: none;
+            stroke: #969799;
+        }
+
+        .yAxis text {
+            font-size: 12px;
+            fill: black;
+            font-family: 'Open Sans Light', sans-serif;
+            text-anchor: end;
+        }
+
+        .yAxis path,
+        .yAxis line {
+            fill: none;
+            stroke: #28292D;
+            visibility: hidden;
+        }
+
+        .yAxisStazione {
+            font-style: normal;
+        }
+
+        .yAxisFermata {
+            font-style: italic;
+        }
+
+        .yAxisBivio {
+            font-variant: small-caps;
+        }
+
+        .yAxisKM path,
+        .yAxisKM line {
+            fill: none;
+            stroke: #28292D;
+        }
+
+        .yAxisKM text {
+            font-size: 12px;
+            fill: black;
+            font-family: 'Open Sans Light', sans-serif;
+        }
+
+        .yAxisDelay text {
+            font-size: 12px;
+            font-family: 'Open Sans Light', sans-serif;
+            visibility: hidden;
+        }
+
+        .yAxisRitardo {
+            fill: red;
+        }
+
+        .yAxisAnticipo {
+            fill: green;
+        }
+
+        .yAxisDelay path,
+        .yAxisDelay line {
+            fill: none;
+            stroke: #969799;
+        }
+
+        .horizontal-line {
+            stroke-width: 1;
+            stroke: black;
+        }
+
+        .vertical-line {
+            stroke-width: 1;
+            stroke: black;
+        }
+
+        .train {
+            stroke-width: 0.125em;
+        }
+
+        .train-mp {
+            stroke: #FF7800;
+        }
+
+        text.train-mp {
+            fill: #FF7800;
+        }
+
+        .train-te {
+            stroke: #8F3CD0;
+        }
+
+        text.train-te {
+            fill: #8F3CD0;
+        }
+
+        .train-acs {
+            stroke: #BFEFFF;
+        }
+
+        text.train-acs {
+            fill: #BFEFFF;
+        }
+
+        .train-pap {
+            stroke: #FFFFCE;
+        }
+
+        text.train-pap {
+            fill: #FFFFCE;
+        }
+
+        .train-fp {
+            stroke: #8F3CD0;
+        }
+
+        text.train-fp {
+            fill: #8F3CD0;
+        }
+
+        .train-disab {
+            stroke: #87A091;
+        }
+
+        text.train-disab {
+            fill: #87A091;
+        }
+
+        .train-SP {
+            stroke: #b4b4b4;
+            stroke-dasharray: 2;
+            stroke-dashoffset: 2;
+        }
+
+        text.train-SP {
+            fill: #b4b4b4;
+        }
+
+        .train-LB {
+            stroke: #b4b4b4;
+            stroke-dasharray: 2;
+            stroke-dashoffset: 2;
+        }
+
+        text.train-LB {
+            fill: #b4b4b4;
+        }
+
+        .train-PN {
+            stroke: #b4b4b4;
+            stroke-dasharray: 2;
+            stroke-dashoffset: 2;
+        }
+
+        text.train-PN {
+            fill: #b4b4b4;
+        }
+
+        .train-DI {
+            stroke: #b4b4b4;
+            stroke-dasharray: 2;
+            stroke-dashoffset: 2;
+        }
+
+        text.train-DI {
+            fill: #b4b4b4;
+        }
+
+        .train-OP {
+            stroke: #b4b4b4;
+            stroke-dasharray: 2;
+            stroke-dashoffset: 2;
+        }
+
+        text.train-OP {
+            fill: #b4b4b4;
+        }
+
+
+        .train-PP {
+            stroke: #b4b4b4;
+            stroke-dasharray: 2;
+            stroke-dashoffset: 2;
+        }
+
+        text.train-PP {
+            fill: #b4b4b4;
+        }
+
+        .train-AP {
+            stroke: #b4b4b4;
+            stroke-dasharray: 2;
+            stroke-dashoffset: 2;
+        }
+
+        text.train-AP {
+            fill: #b4b4b4;
+        }
+
+        .trainNumber {
+            fill: black;
+        }
+
+        text.trainDelay {
+            font-size: 10px;
+            fill: black;
+            stroke: black;
+        }
+
+        .layerTrenoInteresse {
+            stroke: white;
+            stroke-linecap: round;
+            stroke-opacity: 0.7;
+            fill: transparent;
+        }
+
+        .layerHidden {
+            stroke: transparent;
+            fill: transparent;
+        }
+
+        .trainANTICIPO {
+            stroke: #c8c8c8;
+        }
+
+        text.trainANTICIPO {
+            fill: #c8c8c8;
+        }
+
+        .trainRIT05MIN {
+            stroke: #99cc64;
+        }
+
+        text.trainRIT05MIN {
+            fill: #99cc64;
+        }
+
+        .trainRIT30MIN {
+            stroke: #dcdc00;
+        }
+
+        text.trainRIT30MIN {
+            fill: #dcdc00;
+        }
+
+        .trainRIT60MIN {
+            stroke: #ff0000;
+        }
+
+        text.trainRIT60MIN {
+            fill: #ff0000;
+        }
+
+        .trainRITOLTRE {
+            stroke: #ff00ff;
+        }
+
+        text.trainRITOLTRE {
+            fill: #ff00ff;
+        }
+
+        .trainINCREMENTO {
+            stroke: #ff0000;
+        }
+
+        text.trainINCREMENTO {
+            fill: #ff0000;
+        }
+
+        .trainSTABILE {
+            stroke: gray;
+        }
+
+        text.trainSTABILE {
+            fill: gray;
+        }
+
+        .trainRECUPERO {
+            stroke: #00ff00;
+        }
+
+        text.trainRECUPERO {
+            fill: #00ff00;
+        }
+
+        .train-EC {
+            stroke: #00ff00;
+        }
+
+        text.train-EC {
+            fill: #00ff00;
+        }
+
+        .train-IC {
+            stroke: #00ff00;
+        }
+
+        text.train-IC {
+            fill: #00ff00;
+        }
+
+        .train-EN {
+            stroke: #00ff00;
+        }
+
+        text.train-EN {
+            fill: #00ff00;
+        }
+
+        .train-ESSTAR {
+            stroke: #00ff00;
+        }
+
+        text.train-ESSTAR {
+            fill: #00ff00;
+        }
+
+        .train-EXP {
+            stroke: #66ffff;
+        }
+
+        text.train-EXP {
+            fill: #66ffff;
+        }
+
+        .train-PRM {
+            stroke: #5361f4;
+        }
+
+        .train-SCO {
+            stroke: #8F3CD0;
+        }
+
+        textPath.symbolprm {
+            fill: white;
+        }
+
+        .symbolprmbg {
+            fill: #5361f4;
+            font-family: FontAwesome;
+            cursor: pointer;
+            text-anchor: middle;
+        }
+
+        .train-background {
+            stroke: white;
+            stroke-linecap: round;
+        }
+
+        .trainORARIOPERIODO {
+            stroke: #3c3c3c;
+            stroke-width: 3;
+        }
+
+        .train-IR {
+            stroke: #66ffff;
+        }
+
+        text.train-IR {
+            fill: #66ffff;
+        }
+
+        .train-PRW {
+            stroke: #ff00ff;
+        }
+
+        text.train-PRW {
+            fill: #ff00ff;
+        }
+
+        .train-DIR {
+            stroke: #D0D711;
+        }
+
+        text.train-DIR {
+            fill: #D0D711;
+        }
+
+        .train-REG {
+            stroke: #D0D711;
+        }
+
+        text.train-REG {
+            fill: #D0D711;
+        }
+
+        .train-MET {
+            stroke: #D0D711;
+        }
+
+        text.train-MET {
+            fill: #D0D711;
+        }
+
+        .train-INV {
+            stroke: blue;
+        }
+
+        text.train-INV {
+            fill: blue;
+        }
+
+        .train-CP {
+            stroke: blue;
+        }
+
+        text.train-CP {
+            fill: blue;
+        }
+
+        .train-MC {
+            stroke: blue;
+        }
+
+        text.train-MC {
+            fill: blue;
+        }
+
+        .train-MP {
+            stroke: blue;
+        }
+
+        text.train-MP {
+            fill: blue;
+        }
+
+        .train-STM {
+            stroke: blue;
+        }
+
+        text.train-STM {
+            fill: blue;
+        }
+
+        .train-EUC {
+            stroke: blue;
+        }
+
+        text.train-EUC {
+            fill: blue;
+        }
+
+        .train-TEC {
+            stroke: blue;
+        }
+
+        text.train-TEC {
+            fill: blue;
+        }
+
+        .train-MRI {
+            stroke: blue;
+        }
+
+        text.train-MRI {
+            fill: blue;
+        }
+
+        .train-TCS {
+            stroke: blue;
+        }
+
+        text.train-TCS {
+            fill: blue;
+        }
+
+        .train-TC {
+            stroke: blue;
+        }
+
+        text.train-TC {
+            fill: blue;
+        }
+
+        .train-MRV {
+            stroke: blue;
+        }
+
+        text.train-MRV {
+            fill: blue;
+        }
+
+        .train-MRS {
+            stroke: blue;
+        }
+
+        text.train-MRS {
+            fill: blue;
+        }
+
+        .train-MR {
+            stroke: blue;
+        }
+
+        text.train-MR {
+            fill: blue;
+        }
+
+        .train-MI {
+            stroke: blue;
+        }
+
+        text.train-MI {
+            fill: blue;
+        }
+
+        .train-MT {
+            stroke: blue;
+        }
+
+        text.train-MT {
+            fill: blue;
+        }
+
+        .train-TRA {
+            stroke: blue;
+        }
+
+        text.train-TRA {
+            fill: blue;
+        }
+
+        .train-MD {
+            stroke: blue;
+        }
+
+        text.train-MD {
+            fill: blue;
+        }
+
+        .train-TME {
+            stroke: #0000ff;
+        }
+
+        text.train-TME {
+            fill: #0000ff;
+        }
+
+        .train-LIS {
+            stroke: #ff0000;
+        }
+
+        text.train-LIS {
+            fill: #ff0000;
+        }
+
+        .train-NCL {
+            stroke: #804000;
+        }
+
+        text.train-NCL {
+            fill: #804000;
+        }
+
+        .train-LAV {
+            stroke: #804000;
+        }
+
+        text.train-LAV {
+            fill: #804000;
+        }
+
+        .evento_anomalo rect {
+            fill: #D20000;
+            fill-opacity: 0.1;
+            stroke-width: 3;
+            stroke: #D20000;
+        }
+
+
+        rect.interruzione {
+            stroke-width: 3;
+        }
+
+        .interruzione-pubblicata {
+            stroke: #00b400;
+        }
+
+        .interruzione-richiesta {
+            stroke: #FF7800;
+        }
+
+        .interruzione-concessa {
+            stroke: #ff0000;
+        }
+
+        .interruzione-annullata {
+            stroke: #7f7f7f;
+        }
+
+        .interruzione-nonconcessa {
+            stroke: #7f7f7f;
+        }
+
+        .interruzione-rinunciata {
+            stroke: #7f7f7f;
+        }
+
+        .interruzione-inlavorazione {
+            stroke: #7f7f7f;
+        }
+
+        .interruzione-accidentale {
+            stroke: #ff0000;
+        }
+
+        .interruzione-inintervento {
+            stroke: #7f7f7f;
+        }
+
+        .interruzione-default {
+            stroke: #c8c8c8;
+        }
+
+        .programmainterr-nonpubbl {
+            stroke: #ffff00;
+        }
+
+        .programmainterr-pubbl {
+            stroke: #00b400;
+        }
+
+        .interruzione-nonpubbl {
+            stroke: #2b60cd;
+        }
+
+        .interruzione-insamano {
+            stroke: #a8a8a8;
+        }
+
+        .interruzione-insdacodprogramma {
+            stroke: #a8a8a8;
+        }
+
+        .interruzione-insdaprogrammaop {
+            stroke: #00ff00;
+        }
+
+        .programmarallentamento-pubbl {
+            stroke: #2b60cd;
+        }
+
+        .programmarallentamento-nonpubbl {
+            stroke: #f8f505;
+        }
+
+        .rallentamento-pubblnoninatto {
+            stroke: #00b400;
+        }
+
+        .rallentamento-pubblinatto {
+            stroke: #b40000;
+        }
+
+        .rallentamento-nonpubblicato {
+            stroke: #2b60cd;
+        }
+
+        .rallentamento-improvviso {
+            stroke: #b40000;
+        }
+
+
+        rect.rallentamento {
+            stroke-width: 3;
+        }
+
+        .disabilitazione-leg {
+            stroke: #ffff00;
+        }
+
+        .vincolo-leg {
+            stroke: #00FFFF;
+        }
+
+        rect.disabilitazione {
+            fill: #ffff00;
+            stroke-width: 3;
+            stroke: #ffff00;
+        }
+
+        rect.vincolo {
+            fill: #00FFFF;
+            stroke-width: 3;
+            stroke: #00FFFF;
+        }
+
+        rect.evento_anomalo {
+            fill: #D20000;
+            fill-opacity: 0.1;
+            stroke-width: 3;
+            stroke: #D20000;
+        }
+    </style>
+</head>
+
+<body>
+    @svg
+</body>
+
+</html>

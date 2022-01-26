@@ -1,0 +1,22 @@
+{
+  "name": "vehicle-graph-print-service",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --experimental-modules ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "connect": "^3.7.0",
+    "express": "^4.17.2",
+    "pdfkit": "^0.13.0",
+    "puppeteer": "^13.1.1",
+    "svg-to-pdfkit": "^0.1.8",
+    "wkhtmltopdf": "^0.4.0",
+    "xml2js": "^0.4.23"
+  }
+}
