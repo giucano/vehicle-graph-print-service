@@ -12,6 +12,7 @@ const app = express();
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.static('.'));
 
 const port = 3000;
 const dirname = path.resolve(path.dirname(''));
@@ -21,9 +22,9 @@ async function printPDF(html, header, footer) {
     const page = await browser.newPage();
     await page.setContent(html);
     const pdf = await page.pdf({
-        format: 'A0',
+        format: 'A4',
         landscape: true,
-        scale: 0.8,
+        scale: 1.0,
         /*displayHeaderFooter: true,
         headerTemplate: '<span style="font-size: 16px; color: black; width: 100%;text-align: center">' + header + '</span>',
         footerTemplate: '<span style="font-size: 12px; color: black; width: 100%;text-align: center">' + footer + '</span>',
@@ -39,12 +40,14 @@ app.get('/puppeteer', function (req, res) {
     var txt = fs.readFileSync(path.join(dirname, '/example3.txt'), 'utf8');
     var svg = Buffer.from(txt, 'base64');
     var html = fs.readFileSync(path.join(dirname, '/template.html'), 'utf8');
-    html = html.replace('@svg', svg);
+    var svg2 = fs.readFileSync(path.join(dirname, '/example2.svg'), 'utf8');
+    html = html.replace('@svg', svg2);
+    var svg4 = fs.readFileSync(path.join(dirname, '/example4.svg'), 'utf8');
 
     var header = 'Scheduled Graph 21-01-2022 - SEZIONE FINALE LIGURE M.-GENOVA SESTRI';
     var footer = 'Printed on ' + new Date().toLocaleDateString();
 
-    printPDF(html, header, footer).then(pdf => {
+    printPDF(svg4, header, footer).then(pdf => {
         res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length })
         res.send(pdf)
     })
