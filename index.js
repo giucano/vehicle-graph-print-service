@@ -18,17 +18,19 @@ const port = 3000;
 const dirname = path.resolve(path.dirname(''));
 
 async function printPDF(html, header, footer) {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setContent(html);
     const pdf = await page.pdf({
-        format: 'A4',
+        height: 1972 + 50*2,
+        width: 1517 + 50*2,
+        //format: 'A4',
         landscape: true,
-        scale: 1.0,
-        /*displayHeaderFooter: true,
+        //scale: 0.2,
+        displayHeaderFooter: true,
         headerTemplate: '<span style="font-size: 16px; color: black; width: 100%;text-align: center">' + header + '</span>',
         footerTemplate: '<span style="font-size: 12px; color: black; width: 100%;text-align: center">' + footer + '</span>',
-        margin: { top: 50, bottom: 50 }*/
+        margin: { top: 50, right: 50, bottom: 0, left: 50 }
     });
 
     await browser.close();
@@ -37,17 +39,16 @@ async function printPDF(html, header, footer) {
 
 app.get('/puppeteer', function (req, res) {
     console.log('GET /puppeteer');
-    var txt = fs.readFileSync(path.join(dirname, '/example3.txt'), 'utf8');
-    var svg = Buffer.from(txt, 'base64');
-    var html = fs.readFileSync(path.join(dirname, '/template.html'), 'utf8');
-    var svg2 = fs.readFileSync(path.join(dirname, '/example2.svg'), 'utf8');
-    html = html.replace('@svg', svg2);
-    var svg4 = fs.readFileSync(path.join(dirname, '/example4.svg'), 'utf8');
+    //var txt = fs.readFileSync(path.join(dirname, '/example3.txt'), 'utf8');
+    //var svgb64 = Buffer.from(txt, 'base64');
+    //var html = fs.readFileSync(path.join(dirname, '/template.html'), 'utf8');
+    //html = html.replace('@svg', svg2);
+    var svg = fs.readFileSync(path.join(dirname, '/example8.svg'), 'utf8');
 
-    var header = 'Scheduled Graph 21-01-2022 - SEZIONE FINALE LIGURE M.-GENOVA SESTRI';
+    var header = 'Train Graph Print Example';
     var footer = 'Printed on ' + new Date().toLocaleDateString();
 
-    printPDF(svg4, header, footer).then(pdf => {
+    printPDF(svg, header, footer).then(pdf => {
         res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length })
         res.send(pdf)
     })
@@ -57,8 +58,8 @@ app.get('/svg-to-pdfkit', function (req, res) {
     console.log('GET /svg-to-pdfkit');
     var base64 = fs.readFileSync(path.join(dirname, '/example3.txt'), 'utf8');
 
-    var txt = Buffer.from(base64, 'base64');
-    //var txt = fs.readFileSync(path.join(dirname, '/example2.svg'), 'utf8');
+    //var txt = Buffer.from(base64, 'base64');
+    var txt = fs.readFileSync(path.join(dirname, '/example5.svg'), 'utf8');
     var svg, defsObj;
     var defs = fs.readFileSync(path.join(dirname, '/defs.xml'), 'utf8');
 
@@ -79,7 +80,7 @@ app.get('/svg-to-pdfkit', function (req, res) {
 
     const doc = new PDFDocument({
         layout: 'landscape',
-        size: 'A0'
+        size: 'A3'
     });
 
     SVGtoPDF(doc, svg, 0, 0, { preserveAspectRatio: 'none' });
@@ -112,7 +113,7 @@ app.post('/puppeteer', express.raw({ type: 'application/pdf' }), async (req, res
     var html = fs.readFileSync(path.join(dirname, '/template.html'), 'utf8');
     html = html.replace('@svg', svg);
 
-    var header = 'Scheduled Graph 21-01-2022 - SEZIONE FINALE LIGURE M.-GENOVA SESTRI';
+    var header = 'Train Graph Print Example';
     var footer = 'Printed on ' + new Date().toLocaleDateString();
 
     printPDF(html, header, footer).then(pdf => {
